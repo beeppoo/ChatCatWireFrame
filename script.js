@@ -6,7 +6,7 @@ const loginSeniorChoice = document.getElementById('loginSeniorChoice');
 const loginSubmitBtn = document.getElementById('loginSubmitBtn');
 const loginDismissBtn = document.getElementById('loginDismissBtn');
 const sidebarToggle = document.getElementById('sidebarToggle');
-const seniorToggle = document.getElementById('seniorToggle');
+const seniorToggles = document.querySelectorAll('.senior-toggle-input');
 const appRoot = document.getElementById('app');
 const loginBtn = document.getElementById('loginBtn');
 
@@ -21,6 +21,17 @@ function toast(message) {
     setTimeout(function() { node.classList.remove('show'); }, 2400);
     setTimeout(function() { node.remove(); }, 2800);
   }
+}
+
+function setSeniorMode(isSenior) {
+  if (appRoot) {
+    appRoot.classList.toggle('senior', isSenior);
+  }
+  seniorToggles.forEach(function(toggle) {
+    if (toggle.checked !== isSenior) {
+      toggle.checked = isSenior;
+    }
+  });
 }
 
 // Login functions
@@ -38,12 +49,7 @@ function completeLogin(useSenior) {
     loginBtn.textContent = 'Logged in';
     loginBtn.classList.add('pill');
   }
-  if (seniorToggle) {
-    seniorToggle.checked = prefersSenior;
-  }
-  if (appRoot) {
-    appRoot.classList.toggle('senior', prefersSenior);
-  }
+  setSeniorMode(prefersSenior);
   toast(prefersSenior ? 'Logged in with senior UI' : 'You are now logged in.');
   closeLoginOverlay();
 }
@@ -93,10 +99,10 @@ if (sidebarToggle) {
 }
 
 // Senior mode toggle
-if (seniorToggle) {
-  seniorToggle.addEventListener('change', function(e) {
-    if (appRoot) {
-      appRoot.classList.toggle('senior', e.target.checked);
-    }
+if (seniorToggles.length) {
+  seniorToggles.forEach(function(toggle) {
+    toggle.addEventListener('change', function(e) {
+      setSeniorMode(e.target.checked);
+    });
   });
 }
