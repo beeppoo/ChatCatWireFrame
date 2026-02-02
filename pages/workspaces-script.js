@@ -48,6 +48,14 @@ function switchScreen(screenName) {
 // Switch to a specific category and show Files screen
 let currentCategory = 'Drafts';
 let currentProjectName = 'PFM Group Project 1';
+let lastScreenBefore = 'categories'; // Track where we came from
+let categories = ['Drafts', 'Slides', 'References', 'Final Deliverables'];
+let filesByCategory = {
+  'Drafts': [],
+  'Slides': [],
+  'References': [],
+  'Final Deliverables': []
+};
 
 function setCurrentProject(name) {
   currentProjectName = name || 'PFM Group Project 1';
@@ -67,6 +75,7 @@ function openProject(name) {
 
 function switchToCategory(categoryName) {
   currentCategory = categoryName;
+  lastScreenBefore = 'files'; // Coming from incoming/files view
   const filesSectionName = document.getElementById('files-section-name');
   if (filesSectionName) {
     filesSectionName.textContent = categoryName;
@@ -92,9 +101,177 @@ function switchToCategory(categoryName) {
     if (incomingView) incomingView.style.display = 'none';
     if (draftsView) draftsView.style.display = 'block';
     if (exportView) exportView.style.display = 'none';
+    
+    // Update drafts view with files from this category
+    updateCategoryFilesDisplay(categoryName);
   }
   
   switchScreen('files');
+}
+
+function updateCategoryFilesDisplay(categoryName) {
+  const filesList = document.querySelector('#files-drafts-view .files-list');
+  const filesPreview = document.querySelector('#files-drafts-view .incoming-files-preview');
+  
+  if (!filesList || !filesPreview) return;
+  
+  // Clear existing file rows
+  filesList.innerHTML = '';
+  filesPreview.innerHTML = '';
+  
+  const categoryFiles = filesByCategory[categoryName] || [];
+  
+  if (categoryFiles.length === 0) {
+    filesList.innerHTML = '<p class="muted" style="padding: 20px; text-align: center;">No files in this category yet. Drag files from Incoming Files.</p>';
+    return;
+  }
+  
+  // Add preview icons
+  categoryFiles.forEach(function(fileName) {
+    const preview = document.createElement('div');
+    preview.className = 'file-placeholder';
+    preview.textContent = '📄';
+    filesPreview.appendChild(preview);
+  });
+  
+  // Add file rows with "Move to Incoming" button
+  categoryFiles.forEach(function(fileName) {
+    const fileRow = document.createElement('div');
+    fileRow.className = 'file-row';
+    const moveBtn = document.createElement('button');
+    moveBtn.className = 'ghost';
+    moveBtn.textContent = '← Move to Incoming';
+    moveBtn.onclick = function(e) {
+      e.stopPropagation();
+      moveFileToIncoming(fileName, categoryName);
+    };
+    
+    const fileInfo = document.createElement('div');
+    fileInfo.className = 'file-info';
+    fileInfo.innerHTML = '<div class="file-name">' + fileName + '</div><div class="file-meta">Imported file</div>';
+    
+    const fileActions = document.createElement('div');
+    fileActions.className = 'file-actions';
+    fileActions.innerHTML = '<span class="file-date">Today</span>';
+    fileActions.appendChild(moveBtn);
+    
+    fileRow.appendChild(fileInfo);
+    fileRow.appendChild(fileActions);
+    filesList.appendChild(fileRow);
+  });
+}
+
+function moveFileToIncoming(fileName, categoryName) {
+  // Remove from category
+  filesByCategory[categoryName] = filesByCategory[categoryName].filter(function(f) { return f !== fileName; });
+  
+  // Add back to incoming files preview
+  const incomingPreview = document.querySelector('#files-incoming-view .incoming-files-preview');
+  if (incomingPreview) {
+    const fileDiv = document.createElement('div');
+    fileDiv.className = 'file-placeholder';
+    fileDiv.setAttribute('draggable', 'true');
+    fileDiv.setAttribute('data-file-name', fileName);
+    fileDiv.textContent = '📄 ' + fileName;
+    fileDiv.addEventListener('dragstart', function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', fileName);
+    });
+    incomingPreview.appendChild(fileDiv);
+  }
+  
+  // Refresh current category display
+  updateCategoryFilesDisplay(categoryName);
+  
+  toast('"' + fileName + '" moved back to Incoming Files');
+}
+
+function goBack() {
+  if (lastScreenBefore === 'files') {
+    // Go back to Incoming Files view if we came from there
+    switchToCategory('Incoming Files');
+  } else {
+    // Otherwise go back to categories
+    switchScreen('categories');
+  }
+}
+
+function editCategory(oldName) {
+  const newName = prompt('Edit category name:', oldName);
+  if (newName && newName.trim() && newName !== oldName) {
+    const trimmedName = newName.trim();
+    
+    // Rename in categories list
+    const index = categories.indexOf(oldName);
+    if (index > -1) {
+      categories[index] = trimmedName;
+    }
+    
+    // Move files to new category name
+    if (filesByCategory[oldName]) {
+      filesByCategory[trimmedName] = filesByCategory[oldName];
+      delete filesByCategory[oldName];
+    } else {
+      filesByCategory[trimmedName] = [];
+    }
+    
+    // Regenerate categories UI
+    renderCategories();
+    toast('Category renamed to "' + trimmedName + '"');
+  }
+}
+
+function addNewCategory() {
+  const newName = prompt('Enter new category name:');
+  if (newName && newName.trim()) {
+    const trimmedName = newName.trim();
+    
+    if (categories.indexOf(trimmedName) > -1) {
+      toast('Category already exists!');
+      return;
+    }
+    
+    categories.push(trimmedName);
+    filesByCategory[trimmedName] = [];
+    
+    renderCategories();
+    toast('Category "' + trimmedName + '" created');
+  }
+}
+
+function renderCategories() {
+  const grid = document.getElementById('categoriesGrid');
+  if (!grid) return;
+  
+  // Clear and rebuild
+  grid.innerHTML = '';
+  
+  categories.forEach(function(catName) {
+    const card = document.createElement('div');
+    card.className = 'category-card';
+    card.onclick = function() { switchToCategory(catName); };
+    
+    card.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">' +
+      '<div class="category-name">' + catName + '</div>' +
+      '<button class="ghost" style="padding: 4px 8px; font-size: 12px;" onclick="event.stopPropagation(); editCategory(\'' + catName + '\')">✎</button>' +
+      '</div>' +
+      '<div class="category-placeholder"><p>📄</p><p class="muted" style="font-size: 12px; margin-top: 8px;">Preview</p></div>' +
+      '<p class="muted" style="font-size: 12px; margin-top: 12px; text-align: center;">... and more</p>';
+    
+    grid.appendChild(card);
+  });
+  
+  // Add button
+  const addBtn = document.createElement('div');
+  addBtn.className = 'category-card';
+  addBtn.style.cursor = 'default';
+  addBtn.style.display = 'flex';
+  addBtn.style.alignItems = 'center';
+  addBtn.style.justifyContent = 'center';
+  addBtn.onclick = function(e) { e.stopPropagation(); };
+  addBtn.innerHTML = '<button class="primary" onclick="addNewCategory()" style="width: 100%; padding: 20px;">+ Add Category</button>';
+  
+  grid.appendChild(addBtn);
 }
 
 // Toggle all file checkboxes with visual feedback
@@ -128,6 +305,24 @@ function exportFile(fileName) {
 // Handle category file drop (mock drag-drop)
 function handleCategoryDrop(categoryName, fileName) {
   if (fileName) {
+    // Add file to category if not already there
+    if (!filesByCategory[categoryName]) {
+      filesByCategory[categoryName] = [];
+    }
+    if (filesByCategory[categoryName].indexOf(fileName) === -1) {
+      filesByCategory[categoryName].push(fileName);
+    }
+    
+    // Remove from incoming preview
+    const incomingFile = document.querySelector('.file-placeholder[data-file-name="' + fileName + '"]');
+    if (incomingFile) {
+      incomingFile.style.opacity = '0';
+      incomingFile.style.pointerEvents = 'none';
+      setTimeout(function() {
+        incomingFile.remove();
+      }, 300);
+    }
+    
     toast('"' + fileName + '" moved to ' + categoryName);
   } else {
     toast('Files would be categorized as: ' + categoryName);

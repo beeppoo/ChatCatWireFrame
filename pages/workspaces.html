@@ -293,7 +293,7 @@
           </div>
           <div class="topbar__actions">
             <button class="ghost">Add Files</button>
-            <button class="ghost" onclick="switchScreen('categories')">Back</button>
+            <button class="ghost" id="backBtn" onclick="goBack()">Back</button>
           </div>
         </header>
 
@@ -310,9 +310,12 @@
             </div>
 
             <h3 style="margin-bottom: 16px;">Categories</h3>
-            <div class="categories-grid">
-              <div class="category-card">
-                <div class="category-name">Drafts</div>
+            <div class="categories-grid" id="categoriesGrid">
+              <div class="category-card" onclick="switchToCategory('Drafts')">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div class="category-name">Drafts</div>
+                  <button class="ghost" style="padding: 4px 8px; font-size: 12px;" onclick="event.stopPropagation(); editCategory('Drafts')">✎</button>
+                </div>
                 <div class="category-placeholder">
                   <p>📄</p>
                   <p class="muted" style="font-size: 12px; margin-top: 8px;">Preview</p>
@@ -320,8 +323,11 @@
                 <p class="muted" style="font-size: 12px; margin-top: 12px; text-align: center;">... and 10 more</p>
               </div>
 
-              <div class="category-card">
-                <div class="category-name">Slides</div>
+              <div class="category-card" onclick="switchToCategory('Slides')">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div class="category-name">Slides</div>
+                  <button class="ghost" style="padding: 4px 8px; font-size: 12px;" onclick="event.stopPropagation(); editCategory('Slides')">✎</button>
+                </div>
                 <div class="category-placeholder">
                   <p>📊</p>
                   <p class="muted" style="font-size: 12px; margin-top: 8px;">Preview</p>
@@ -329,8 +335,11 @@
                 <p class="muted" style="font-size: 12px; margin-top: 12px; text-align: center;">... and 10 more</p>
               </div>
 
-              <div class="category-card">
-                <div class="category-name">References</div>
+              <div class="category-card" onclick="switchToCategory('References')">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div class="category-name">References</div>
+                  <button class="ghost" style="padding: 4px 8px; font-size: 12px;" onclick="event.stopPropagation(); editCategory('References')">✎</button>
+                </div>
                 <div class="category-placeholder">
                   <p>📚</p>
                   <p class="muted" style="font-size: 12px; margin-top: 8px;">Preview</p>
@@ -338,13 +347,20 @@
                 <p class="muted" style="font-size: 12px; margin-top: 12px; text-align: center;">... and 10 more</p>
               </div>
 
-              <div class="category-card">
-                <div class="category-name">Final Deliverables</div>
+              <div class="category-card" onclick="switchToCategory('Final Deliverables')">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div class="category-name">Final Deliverables</div>
+                  <button class="ghost" style="padding: 4px 8px; font-size: 12px;" onclick="event.stopPropagation(); editCategory('Final Deliverables')">✎</button>
+                </div>
                 <div class="category-placeholder">
                   <p>✓</p>
                   <p class="muted" style="font-size: 12px; margin-top: 8px;">Preview</p>
                 </div>
                 <p class="muted" style="font-size: 12px; margin-top: 12px; text-align: center;">... and 10 more</p>
+              </div>
+
+              <div class="category-card" onclick="event.stopPropagation()" style="cursor: default; display: flex; align-items: center; justify-content: center;">
+                <button class="primary" onclick="addNewCategory()" style="width: 100%; padding: 20px;">+ Add Category</button>
               </div>
             </div>
           </div>
