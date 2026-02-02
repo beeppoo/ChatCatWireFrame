@@ -29,10 +29,6 @@
         <button class="nav__item" data-page="emotion" onclick="location.href='emotion-scan.html'">Emotion Scan</button>
       </nav>
       <div class="sidebar__footer">
-        <label class="toggle">
-          <input type="checkbox" id="seniorToggle" />
-          <span>Senior-friendly UI</span>
-        </label>
         <div class="user">
           <div class="avatar">CC</div>
           <div>
@@ -49,6 +45,10 @@
         <header class="topbar">
           <h2>Workspaces</h2>
           <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
             <button class="ghost">Add Files</button>
             <button class="primary" id="newProjectBtn">+ New</button>
           </div>
@@ -137,6 +137,10 @@
             <span class="breadcrumb-item" id="breadcrumbProjectCategories">PFM Group Project 1</span>
           </div>
           <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
             <button class="ghost">Add Files</button>
           </div>
         </header>
@@ -208,6 +212,10 @@
             <span class="breadcrumb-item" id="breadcrumbProjectImport">PFM Group Project 1</span>
           </div>
           <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
             <button class="ghost">Add Files</button>
             <button class="ghost" onclick="switchScreen('overview')">Back</button>
           </div>
@@ -292,6 +300,10 @@
             <span class="breadcrumb-item" id="files-section-name">Drafts</span>
           </div>
           <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
             <button class="ghost">Add Files</button>
             <button class="ghost" id="backBtn" onclick="goBack()">Back</button>
           </div>

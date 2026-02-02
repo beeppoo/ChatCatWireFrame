@@ -44,7 +44,7 @@ const recentUploads = [
 // DOM elements
 const toastContainer = document.getElementById('toastContainer');
 const sidebarToggle = document.getElementById('sidebarToggle');
-const seniorToggle = document.getElementById('seniorToggle');
+const seniorToggles = document.querySelectorAll('.senior-toggle-input');
 const appRoot = document.getElementById('app');
 
 // Toast notification
@@ -77,11 +77,22 @@ if (sidebarToggle) {
   });
 }
 
-// Senior mode toggle
-if (seniorToggle) {
-  seniorToggle.addEventListener('change', function(e) {
-    if (appRoot) {
-      appRoot.classList.toggle('senior', e.target.checked);
+function setSeniorMode(isSenior) {
+  if (appRoot) {
+    appRoot.classList.toggle('senior', isSenior);
+  }
+  seniorToggles.forEach(function(toggle) {
+    if (toggle.checked !== isSenior) {
+      toggle.checked = isSenior;
     }
+  });
+}
+
+// Senior mode toggle
+if (seniorToggles.length) {
+  seniorToggles.forEach(function(toggle) {
+    toggle.addEventListener('change', function(e) {
+      setSeniorMode(e.target.checked);
+    });
   });
 }

@@ -29,10 +29,6 @@
         <button class="nav__item" data-page="emotion" onclick="location.href='emotion-scan.html'">Emotion Scan</button>
       </nav>
       <div class="sidebar__footer">
-        <label class="toggle">
-          <input type="checkbox" id="seniorToggle" />
-          <span>Senior-friendly UI</span>
-        </label>
         <div class="user">
           <div class="avatar">CC</div>
           <div>
@@ -47,8 +43,16 @@
       <!-- UPLOAD PAGE -->
       <div class="page active" id="page-upload" data-page="upload">
         <header class="topbar">
-          <h2>Upload WhatsApp Chat</h2>
-          <p class="muted">Your Exported Chat Zip Folder</p>
+          <div>
+            <h2>Upload WhatsApp Chat</h2>
+            <p class="muted">Your Exported Chat Zip Folder</p>
+          </div>
+          <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
+          </div>
         </header>
         
         <section class="panel">

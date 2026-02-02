@@ -29,10 +29,6 @@
         <button class="nav__item" data-page="emotion" onclick="location.href='emotion-scan.html'">Emotion Scan</button>
       </nav>
       <div class="sidebar__footer">
-        <label class="toggle">
-          <input type="checkbox" id="seniorToggle" />
-          <span>Senior-friendly UI</span>
-        </label>
         <div class="user">
           <div class="avatar">CC</div>
           <div>
@@ -47,6 +43,12 @@
       <div class="page active" id="page-summarize" data-page="summarize">
         <header class="topbar">
           <h2>Summarize Chats</h2>
+          <div class="topbar__actions">
+            <label class="senior-toggle-btn">
+              <input type="checkbox" class="senior-toggle-input" />
+              <span>Senior UI Mode</span>
+            </label>
+          </div>
         </header>
 
         <div class="stepper" id="summaryStepper">
