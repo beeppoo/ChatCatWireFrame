@@ -97,6 +97,7 @@
                     <input type="date" id="dateTo" />
                   </div>
                 </div>
+                <p class="helper">Tip: A tighter date range usually yields a more accurate, more detailed summary for that period.</p>
                 <button class="primary" id="summarizeBtn">Generate summary</button>
                 <div class="summary-preview" id="summaryPreview">
                   Select a chat to generate a summary preview.
@@ -222,6 +223,26 @@
       return true;
     }
 
+    function getTodayIso() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function enforceDateMax() {
+      const todayIso = getTodayIso();
+      if (dateFrom) {
+        dateFrom.max = todayIso;
+        if (dateFrom.value && dateFrom.value > todayIso) {
+          dateFrom.value = '';
+        }
+      }
+      if (dateTo) {
+        dateTo.max = todayIso;
+        if (dateTo.value && dateTo.value > todayIso) {
+          dateTo.value = '';
+        }
+      }
+    }
+
 
     function appendBotMessage(html) {
       if (!chatbotThread) return;
@@ -252,14 +273,14 @@
       if (chatbotThread) {
         chatbotThread.innerHTML = '';
       }
-      appendBotMessage('<p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">Summary ready</p>' +
-        '<p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">' + topicLabel + '</p>' +
-        '<ul style="margin: 0; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.6;">' +
+      appendBotMessage('<p class="chatbot-heading">Summary ready</p>' +
+        '<p class="chatbot-muted" style="margin-bottom: 10px;">' + topicLabel + '</p>' +
+        '<ul class="chatbot-list chatbot-muted">' +
         '<li>Key themes were grouped into 3 clusters.</li>' +
         '<li>Most active participants: Demo User, Kai, Jasmine.</li>' +
         '<li>Action items appeared most often in the last 7 days.</li>' +
         '</ul>');
-      appendBotMessage('<p style="margin: 0; font-size: 12px; color: var(--muted);">Ask for details like “show key decisions” or “list unanswered questions”.</p>');
+      appendBotMessage('<p class="chatbot-muted" style="margin: 0;">Ask for details like “show key decisions” or “list unanswered questions”.</p>');
     }
 
     function handleGenerateSummary() {
@@ -274,8 +295,8 @@
       const chat = chats[selectedIndex];
       const topic = topicInput.value.trim();
       const topicLine = topic ? 'Topic: ' + topic : 'Topic: All messages';
-      summaryPreview.innerHTML = '<p style="margin: 0 0 6px; font-weight: 600; color: var(--text);">Summary ready</p>' +
-        '<p style="margin: 0; font-size: 12px; color: var(--muted);">Chat: ' + chat.name + ' · ' + range + ' · ' + topicLine + '</p>';
+      summaryPreview.innerHTML = '<p class="chatbot-heading">Summary ready</p>' +
+        '<p class="chatbot-muted" style="margin: 0;">Chat: ' + chat.name + ' · ' + range + ' · ' + topicLine + '</p>';
       setLoading(true);
       setTimeout(function() {
         setLoading(false);
@@ -301,7 +322,7 @@
       }
       appendUserMessage(text);
       const response = 'Here are more details about "' + text + '". I can also break it down by participant or date if needed.';
-      appendBotMessage('<p style="margin: 0; font-size: 12px; color: var(--muted);">' + response + '</p>');
+      appendBotMessage('<p class="chatbot-muted" style="margin: 0;">' + response + '</p>');
       chatbotInput.value = '';
     }
 
@@ -334,6 +355,8 @@
     }
 
     setStepper('setup');
+
+    enforceDateMax();
 
     renderChats();
   </script>

@@ -843,6 +843,51 @@ button.block { width: 100%; margin-top: 10px; }
   color: var(--text);
 }
 
+.chatbot-heading {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chatbot-muted {
+  color: var(--muted);
+}
+
+.chatbot-list {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+}
+
+.senior .chatbot-message {
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.senior .chatbot-heading {
+  font-size: 20px;
+}
+
+.senior .chatbot-muted {
+  color: rgba(244, 244, 246, 0.85);
+}
+
+.senior .summary-preview {
+  font-size: 18px;
+  color: rgba(244, 244, 246, 0.85);
+}
+
+/* Senior mode: maximum contrast for bot summary cards */
+.senior .chatbot-message.bot {
+  background: #000;
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #fff;
+}
+
+.senior .chatbot-message.bot .chatbot-muted {
+  color: rgba(255, 255, 255, 0.92);
+}
+
 .chatbot-input {
   display: grid;
   grid-template-columns: 1fr auto;
