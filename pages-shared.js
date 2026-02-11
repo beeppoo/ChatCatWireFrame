@@ -193,6 +193,39 @@ function deleteWorkspace(index) {
   }
 }
 
+function validateWhatsappUploadFile(file) {
+  if (!file || !file.name) {
+    return { valid: false, reason: 'missing' };
+  }
+
+  const fileName = file.name.toLowerCase();
+  if (file.type === 'application/pdf' || fileName.endsWith('.pdf')) {
+    return { valid: false, reason: 'pdf' };
+  }
+
+  if (fileName.endsWith('.zip')) {
+    return { valid: true };
+  }
+
+  return { valid: false, reason: 'unsupported' };
+}
+
+function handleWhatsappUploadSelection(file, fileInput) {
+  const validation = validateWhatsappUploadFile(file);
+  if (!validation.valid) {
+    if (validation.reason === 'pdf') {
+      toast('PDF files are not allowed here. Please upload a WhatsApp .zip export.');
+    } else {
+      toast('Only WhatsApp .zip exports are supported on this page.');
+    }
+
+    if (fileInput) fileInput.value = '';
+    return;
+  }
+
+  simulateUpload(file.name);
+}
+
 // Initialize page-specific elements
 document.addEventListener('DOMContentLoaded', function() {
   // Workspaces page setup
@@ -260,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
-        simulateUpload(file.name);
+        handleWhatsappUploadSelection(file, fileInput);
       }
     });
   }
