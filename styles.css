@@ -1667,6 +1667,14 @@ button.block { width: 100%; margin-top: 10px; }
   justify-items: start;
 }
 
+/* Keep waiting-to-drop attachments packed from the left */
+#files-incoming-view .incoming-files-preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
 .file-placeholder {
   aspect-ratio: 1;
   width: 100%;
@@ -1686,6 +1694,11 @@ button.block { width: 100%; margin-top: 10px; }
   transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
   cursor: grab;
   overflow-wrap: anywhere;
+}
+
+#files-incoming-view .file-placeholder {
+  flex: 1 1 140px;
+  min-width: 140px;
 }
 
 .file-placeholder:hover {
