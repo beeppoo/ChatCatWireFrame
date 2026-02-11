@@ -161,6 +161,62 @@ function updateCategoryFilesDisplay(categoryName) {
   });
 }
 
+function initializeIncomingFileDrag(fileNode) {
+  if (!fileNode || fileNode.dataset.dragBound === 'true') return;
+
+  fileNode.dataset.dragBound = 'true';
+  fileNode.setAttribute('draggable', 'true');
+
+  fileNode.addEventListener('dragstart', function(e) {
+    const fileName = fileNode.dataset.fileName || fileNode.textContent.trim();
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', fileName);
+    fileNode.classList.add('is-dragging');
+  });
+
+  fileNode.addEventListener('dragend', function() {
+    fileNode.classList.remove('is-dragging');
+  });
+}
+
+function initializeIncomingCategoryDrop(card) {
+  if (!card || card.dataset.dropBound === 'true') return;
+
+  const categoryNameNode = card.querySelector('.category-name');
+  if (!categoryNameNode) return;
+
+  card.dataset.dropBound = 'true';
+  const originalShadow = card.style.boxShadow;
+
+  card.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    card.style.boxShadow = '0 0 0 2px var(--accent)';
+  });
+
+  card.addEventListener('dragleave', function() {
+    card.style.boxShadow = originalShadow;
+  });
+
+  card.addEventListener('drop', function(e) {
+    e.preventDefault();
+    card.style.boxShadow = originalShadow;
+    const fileName = e.dataTransfer.getData('text/plain') || '';
+    handleCategoryDrop(categoryNameNode.textContent, fileName);
+  });
+}
+
+function setupIncomingDragAndDrop() {
+  const incomingFiles = document.querySelectorAll('#files-incoming-view .file-placeholder');
+  incomingFiles.forEach(function(fileNode) {
+    initializeIncomingFileDrag(fileNode);
+  });
+
+  const incomingDropTargets = document.querySelectorAll('#files-incoming-view .category-card');
+  incomingDropTargets.forEach(function(card) {
+    initializeIncomingCategoryDrop(card);
+  });
+}
+
 function moveFileToIncoming(fileName, categoryName) {
   // Remove from category
   filesByCategory[categoryName] = filesByCategory[categoryName].filter(function(f) { return f !== fileName; });
@@ -170,13 +226,9 @@ function moveFileToIncoming(fileName, categoryName) {
   if (incomingPreview) {
     const fileDiv = document.createElement('div');
     fileDiv.className = 'file-placeholder';
-    fileDiv.setAttribute('draggable', 'true');
     fileDiv.setAttribute('data-file-name', fileName);
     fileDiv.textContent = '📄 ' + fileName;
-    fileDiv.addEventListener('dragstart', function(e) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', fileName);
-    });
+    initializeIncomingFileDrag(fileDiv);
     incomingPreview.appendChild(fileDiv);
   }
   
@@ -272,6 +324,8 @@ function renderCategories() {
   addBtn.innerHTML = '<button class="primary" onclick="addNewCategory()" style="width: 100%; padding: 20px;">+ Add Category</button>';
   
   grid.appendChild(addBtn);
+
+  setupIncomingDragAndDrop();
 }
 
 // Toggle all file checkboxes with visual feedback
@@ -314,7 +368,10 @@ function handleCategoryDrop(categoryName, fileName) {
     }
     
     // Remove from incoming preview
-    const incomingFile = document.querySelector('.file-placeholder[data-file-name="' + fileName + '"]');
+    const incomingFiles = document.querySelectorAll('#files-incoming-view .file-placeholder[data-file-name]');
+    const incomingFile = Array.from(incomingFiles).find(function(fileNode) {
+      return fileNode.dataset.fileName === fileName;
+    });
     if (incomingFile) {
       incomingFile.style.opacity = '0';
       incomingFile.style.pointerEvents = 'none';
@@ -438,9 +495,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Category card interactions with visual feedback
   const categoryCards = document.querySelectorAll('.category-card');
   categoryCards.forEach(function(card, index) {
+    const categoryNameNode = card.querySelector('.category-name');
+    if (!categoryNameNode) return;
+
     card.addEventListener('click', function() {
-      const categoryName = card.querySelector('.category-name').textContent;
-      toast('Viewing ' + categoryName + ' category');
+      toast('Viewing ' + categoryNameNode.textContent + ' category');
     });
     
     // Allow keyboard navigation
@@ -472,37 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Drag-drop: incoming files -> categories (Incoming view)
-  const incomingFiles = document.querySelectorAll('#files-incoming-view .file-placeholder');
-  incomingFiles.forEach(function(file) {
-    file.setAttribute('draggable', 'true');
-    file.addEventListener('dragstart', function(e) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', file.dataset.fileName || file.textContent.trim());
-    });
-  });
-
-  const incomingDropTargets = document.querySelectorAll('#files-incoming-view .category-card');
-  incomingDropTargets.forEach(function(card) {
-    const categoryNameNode = card.querySelector('.category-name');
-    const categoryName = categoryNameNode ? categoryNameNode.textContent : 'Category';
-    let originalShadow = card.style.boxShadow;
-
-    card.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      card.style.boxShadow = '0 0 0 2px var(--accent)';
-    });
-
-    card.addEventListener('dragleave', function() {
-      card.style.boxShadow = originalShadow;
-    });
-
-    card.addEventListener('drop', function(e) {
-      e.preventDefault();
-      card.style.boxShadow = originalShadow;
-      const fileName = e.dataTransfer.getData('text/plain') || 'File';
-      handleCategoryDrop(categoryName, fileName);
-    });
-  });
+  setupIncomingDragAndDrop();
 
   // Project card click navigation
   const projectCards = document.querySelectorAll('.project-card');
